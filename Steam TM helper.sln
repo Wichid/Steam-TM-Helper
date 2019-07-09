@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28922.388
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steam TM helper", "Steam TM helper\Steam TM helper.csproj", "{F4170326-3ADE-486B-ADA8-AB3AED01D070}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F4170326-3ADE-486B-ADA8-AB3AED01D070}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4170326-3ADE-486B-ADA8-AB3AED01D070}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4170326-3ADE-486B-ADA8-AB3AED01D070}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4170326-3ADE-486B-ADA8-AB3AED01D070}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AC03B3DF-274D-4174-95B5-F8FEA2E62EFE}
+	EndGlobalSection
+EndGlobal
