@@ -15,42 +15,50 @@ namespace Steam_TM_helper
 
                 case "Red":
                     Console.BackgroundColor = ConsoleColor.Red;
+                    Console.WriteLine("[ОШИБКА] " + Text);
                     break;
 
                 case "Green":
                     Console.BackgroundColor = ConsoleColor.Green;
+                    Console.WriteLine(Text);
+
                     break;
 
                 case "Blue":
                     Console.BackgroundColor = ConsoleColor.Blue;
+                    Console.WriteLine(Text);
                     break;
 
                 case "DarkRed":
                     Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("[ОШИБКА] " + Text);
                     break;
 
                 case "DarkYellow":
                     Console.BackgroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine(Text);
+
                     break;
 
                 default:
                     Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("ОШИБКА СМЕНЫ ТЕКСТА");
+                    Console.WriteLine("[ОШИБКА] НЕПРАВЕЛЬНЫЙ ЦВЕТ");
                     Console.ResetColor();
                     break;
             }
-            
-            Console.WriteLine(Text);
+                        
             Console.ResetColor();
         }
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Steam TM helper Update v4\n");
-            bool Main_Loop = true;
 
+            bool Main_Loop = true;
             while (Main_Loop == true) {
-            Console.WriteLine("Выберите режим:\n \t1. Оффлайн режим \n \t2. Онлайн режим \n \t3. Настройки \n\n \t0. Выход");
+                Console.Clear();                
+                
+                Console.WriteLine("Steam TM helper Update v3\n");
+                Console.WriteLine("Выберите режим:\n \t1. Оффлайн режим \n \t2. Онлайн режим \n \t3. Настройки \n\n \t0. Выход");
 
                 ConsoleKey KeyChoice = Console.ReadKey(true).Key;
                 switch (KeyChoice){ // Выбор режима Онлайн или Офлайн
@@ -62,7 +70,6 @@ namespace Steam_TM_helper
                         { // Выбор Купить, Расчёт стоимости предмета, Продажа
 
                             case ConsoleKey.D1:
-                                Console.WriteLine("[КУПИТЬ] "); // ОФОРМЛЕНИЕ!!!
 
                                 bool buy = true; // цикл для покупки
                                 double ItemPrice = 0;
@@ -74,7 +81,7 @@ namespace Steam_TM_helper
 
                                     while (IteP == true) // пррверка
                                     {
-                                        Console.Write("Введите цену за один предмет: ");
+                                        Console.Write("\n[КУПИТЬ] Введите цену за один предмет: ");
 
                                         if (!Double.TryParse(Console.ReadLine(), out ItemPrice))
                                             Text_Color("DarkRed", "Введите число в формате 1,23");
@@ -85,7 +92,7 @@ namespace Steam_TM_helper
 
                                     while (IteC == true) // пррверка
                                     {
-                                        Console.Write("Введите кол-во предметов: ");
+                                        Console.Write("[КУПИТЬ] Введите кол-во предметов: ");
 
                                         if (!Int32.TryParse(Console.ReadLine(), out ItemCount))
                                             Text_Color("Red", "Введите целое число");
@@ -116,8 +123,7 @@ namespace Steam_TM_helper
                                 break; // конец цикл покупки
 
                             case ConsoleKey.D2:
-                                Console.WriteLine("[РАСЧЕТ] ");
-                                Console.WriteLine("Расчет кол-ва предметов на сколько вам хватит");
+                                Console.WriteLine("\n[РАСЧЕТ] Расчет кол-ва предметов на сколько вам хватит");
 
                                 bool Count_Buy = true; // цикл для расчета
 
@@ -130,7 +136,7 @@ namespace Steam_TM_helper
 
                                     while (Sec_Price == true) // пррверка цены
                                     {
-                                        Console.Write("Введите цену за один предмет: ");
+                                        Console.Write("[РАСЧЕТ] Введите цену за один предмет: ");
 
                                         if (!Double.TryParse(Console.ReadLine(), out Item_Price))
                                             Text_Color("DarkRed", "Введите число в формате 1,23");
@@ -141,7 +147,7 @@ namespace Steam_TM_helper
 
                                     while (Sec_Balance == true) // пррверка баланса
                                     {
-                                        Console.Write("Введите ваш бюджет: ");
+                                        Console.Write("[РАСЧЕТ] Введите ваш бюджет: ");
 
                                         if (!Double.TryParse(Console.ReadLine(), out Balance))
                                             Text_Color("DarkRed", "Введите число в формате 1,23");
@@ -150,7 +156,7 @@ namespace Steam_TM_helper
                                         else Text_Color("Red", "Введите число > 0");
                                     }
 
-                                    Console.Write("Вы сможите купить себе: ");
+                                    Console.Write("[РАСЧЕТ] Вы сможите купить себе: ");
                                     var (x, y) = (Console.CursorLeft, Console.CursorTop);
                                     while (Sec_Func == true)
                                     {
@@ -213,7 +219,6 @@ namespace Steam_TM_helper
                     case ConsoleKey.D0:
                         Console.WriteLine("Закрытие bb...");
                         Main_Loop = false;
-
                         break;
 
                 }
