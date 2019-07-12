@@ -52,6 +52,8 @@ namespace Steam_TM_helper
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Steam TM helper Update v4\n");
+            bool Main_Loop = true;
 
             bool Main_Loop = true;
             while (Main_Loop == true) {
