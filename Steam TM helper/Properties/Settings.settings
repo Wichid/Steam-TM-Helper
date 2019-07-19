@@ -3,7 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="Currency_Type" Type="System.String" Scope="User">
-      <Value Profile="(Default)">test</Value>
+      <Value Profile="(Default)">руб.</Value>
+    </Setting>
+    <Setting Name="SteamID" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>
