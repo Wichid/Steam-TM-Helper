@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Threading;
+using System.Xml;
+using System.Net;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +12,31 @@ namespace Steam_TM_helper
 {
     class Program
     {
-        static void Text_Color(string Color, string Text) {
 
-            switch (Color) {
+        static string tSpaceRemover(string Text)
+        {
+
+            if (Text.IndexOf(' ') >= 0)
+            {
+                Text = Text.Remove(Text.IndexOf(' '), 1);
+            }
+
+            if (Text.LastIndexOf(' ') >= 0)
+            {
+                Text = Text.Remove(Text.LastIndexOf(' '), 1);
+            }
+
+
+            return Text;
+
+        }
+
+
+        static void Text_Color(string Color, string Text)
+        {
+
+            switch (Color)
+            {
 
                 case "Red":
                     Console.BackgroundColor = ConsoleColor.Red;
@@ -46,22 +71,24 @@ namespace Steam_TM_helper
                     Console.ResetColor();
                     break;
             }
-                        
+
             Console.ResetColor();
         }
 
         static void Main(string[] args)
         {
             bool Main_Loop = true;
-            
-            while (Main_Loop == true) {
+
+            while (Main_Loop == true)
+            {
                 string CurrencyIsNow = Properties.Settings.Default.Currency_Type;
-                Console.Clear();                                
-                Console.WriteLine("Steam TM helper Update v4\n");
+                Console.Clear();
+                Console.WriteLine("Steam TM helper Update v5\n");
                 Console.WriteLine("Выберите режим:\n \t1. Оффлайн режим \n \t2. Онлайн режим \n \t3. Настройки \n\n \t0. Выход");
 
                 ConsoleKey KeyChoice = Console.ReadKey(true).Key;
-                switch (KeyChoice){ // Выбор режима Онлайн или Офлайн
+                switch (KeyChoice)
+                { // Выбор режима Онлайн или Офлайн
 
                     case ConsoleKey.D1: // Оффлайн часть!
                         Console.WriteLine("\nВы выбрали offline режим\n");
@@ -86,10 +113,11 @@ namespace Steam_TM_helper
 
                                             Text_Color("DarkRed", "Введите число в формате 1,23");
 
-                                        else if (ItemPrice != 0 & ItemPrice > 0) {
+                                        else if (ItemPrice != 0 & ItemPrice > 0)
+                                        {
                                             IteP = false;
-                                            
-                                        } 
+
+                                        }
                                         else Text_Color("DarkRed", "Введите число > 0");
                                     }
 
@@ -103,7 +131,7 @@ namespace Steam_TM_helper
                                         else if (ItemCount != 0 & ItemCount > 0) IteC = false;
                                         else Text_Color("Red", "Введите число > 0");
                                     }
-                                    
+
                                     Console.WriteLine("\nЦена 1-го предмета: " + ItemPrice + " " + CurrencyIsNow + " Кол-во предметов: " + ItemCount + " Итог: " + ItemPrice * ItemCount + " " + CurrencyIsNow);
                                     Console.WriteLine("Продать в ноль за: " + Math.Round((ItemPrice * 0.15) + ItemPrice, 2) + " " + CurrencyIsNow);
 
@@ -166,7 +194,7 @@ namespace Steam_TM_helper
                                             Balance -= Item_Price;
                                             Console.SetCursorPosition(x, y);
                                             Console.Write(Item_Count_All + " предметов");
-                                            if (Balance < Item_Price)
+                                            if (Math.Round(Balance, 2) < Item_Price)
                                             {
                                                 if (Balance != 0)
                                                     Console.Write(", Остаток: " + Math.Round(Balance, 2) + " " + CurrencyIsNow);
@@ -212,7 +240,7 @@ namespace Steam_TM_helper
 
                                     while (Sell_Parce == true) // проверка
                                     {
-                                         Console.Write("[ПРОДАТЬ] Введите цену за один предмет: ");                                        
+                                        Console.Write("[ПРОДАТЬ] Введите цену за один предмет: ");
 
                                         if (!Double.TryParse(Console.ReadLine(), out Sell_Price))
                                             Text_Color("DarkRed", "Введите число в формате 1,23");
@@ -224,8 +252,7 @@ namespace Steam_TM_helper
                                         else Text_Color("DarkRed", "Введите число > 0");
                                     }
                                     Sell_Price *= Sell_Count;
-                                    Console.WriteLine("\nПокупатель заплатит: "+Sell_Price + " " + CurrencyIsNow +" Вы получите: "+ Math.Round((Sell_Price * 0.15 + Sell_Price),2) + " " + CurrencyIsNow);
-                                    Console.WriteLine("Покупатель заплатит: " + Math.Round( ( Sell_Price - (Sell_Price * 0.15) ), 2) + " " + CurrencyIsNow + " Вы получите: " + Sell_Price + " " + CurrencyIsNow);
+                                    Console.WriteLine("\nВы получите: " + Sell_Price + " " + CurrencyIsNow + " Покупатель заплатит: " + Math.Round((Sell_Price * 0.15) + Sell_Price, 2) + " " + CurrencyIsNow);
 
                                     ConsoleKey ContinueSell;
                                     Console.WriteLine("\nХотите ли вы повторить? [Y\\N]");
@@ -241,7 +268,7 @@ namespace Steam_TM_helper
 
                                     }
 
-                                }                                
+                                }
 
                                 break; // прдажа case
 
@@ -254,34 +281,150 @@ namespace Steam_TM_helper
                         break; // конец оффлайн часть
 
                     case ConsoleKey.D2: // ОНЛАЙН ЧАСТЬ!
-                        Console.WriteLine("Вы выбрали online режим");
-                        Console.WriteLine("Тут нечего нет :(");
+                        ConsoleKey oReadKey;
+                        Console.WriteLine("\nВы выбрали offline режим\n");
+                        Console.WriteLine("[ONLINE] Выбирите что вы хотите сделать:\n \t1. Получить данные \n \t2. -\n \t3. -\n\n\t0. Назад");
+
+
+                        switch (oReadKey = Console.ReadKey(true).Key)
+                        {
+
+                            case ConsoleKey.D1:
+
+                                bool sCustomID = false, sSteam64ID = false, sError = false;
+
+                                Console.WriteLine("\n[ONLINE] Получить данные");
+
+                                XmlDocument xDoc = new XmlDocument(); // новый документ
+                                // нужна проверка на 404 и другурие ситуации
+                                // удаление всех символов
+                                Console.WriteLine("\n[ДАННЫЕ] Загрузка xml документа[1].");
+                                xDoc.Load(@"http://steamcommunity.com/id/" + Properties.Settings.Default.SteamID + "/?xml=1"); //Загрузка xml документа по ссылке
+                                Text_Color("Blue", "URL: https://steamcommunity.com/id/" + Properties.Settings.Default.SteamID + "/?xml=1");
+                                XmlElement xRoot = xDoc.DocumentElement; // получение корня xml документа
+
+                                foreach (XmlNode XmlTreeDoc in xRoot)
+                                {
+
+                                    if (XmlTreeDoc.Name == "error")
+                                    { // если xml файл содержит тэг error знатит профиль не найден
+
+                                        Text_Color("DarkRed", tSpaceRemover(XmlTreeDoc.InnerText)); // вывод  сообщения xml файла
+                                        sError = true;
+                                    }
+
+                                    if (XmlTreeDoc.Name == "customURL")
+                                    {
+                                        if (Properties.Settings.Default.SteamID == tSpaceRemover(XmlTreeDoc.InnerText))// проверка на совпадение введённого steam id с тем который в xml файле
+                                        {
+                                            Console.WriteLine("CustomURL == SteamID");
+                                            sCustomID = true;
+                                        }
+
+                                    }
+
+                                    if (XmlTreeDoc.Name == "steamID64")
+                                    {
+
+                                        if (Properties.Settings.Default.SteamID == XmlTreeDoc.InnerText)
+                                        {
+                                            Console.WriteLine("Steam64ID == SteamID");
+                                            sSteam64ID = true;
+                                        }
+
+                                    }
+                                    else if (sError == true)
+                                    { // загрузка второго документа
+                                        Console.WriteLine("\n[ДАННЫЕ] Загрузка xml документа[2].");
+                                        xDoc.Load(@"https://steamcommunity.com/profiles/" + Properties.Settings.Default.SteamID + "/?xml=1"); //Загрузка xml документа по ссылке
+                                        Text_Color("Blue", "URL: https://steamcommunity.com/profiles/" + Properties.Settings.Default.SteamID + "/?xml=1");
+                                        xRoot = xDoc.DocumentElement; // получение корня xml документа
+
+                                        foreach (XmlNode XmlTreeDoc64 in xRoot)
+                                        {
+                                            if (XmlTreeDoc64.Name == "error")
+                                            {
+                                                Text_Color("DarkRed", tSpaceRemover(XmlTreeDoc.InnerText));
+                                                sError = true;
+                                                break;
+                                            }
+
+                                            if (Properties.Settings.Default.SteamID == XmlTreeDoc64.InnerText)
+                                            {
+                                                Console.WriteLine("Steam64ID == SteamID");
+                                                sSteam64ID = true;
+                                            }
+
+
+                                        }
+
+                                    }
+
+
+                                    if (sCustomID == true | sSteam64ID == true & sError == false) // Если хоть одна ссылка заработала то норм
+                                    {
+                                        // дальше идут действия связанные с данными.
+                                        // 
+                                        sCustomID = sSteam64ID = sError = false;
+                                    }
+                                    else if (sCustomID == false & sSteam64ID == false & sError == true)
+                                    { // если ошибка то вывод текста
+
+                                        Text_Color("DarkRed", "Похоже что вы ввели не правельный SteamID[64/Custom], измените его в настройках!");
+                                        Console.WriteLine("sCustomID: {0}, sSteamID64: {1}, sError: {2}", sCustomID, sSteam64ID, sError);
+                                        sCustomID = sSteam64ID = sError = false;
+                                        break;
+                                    }
+
+                                }
+                                ////
+
+                                Console.ReadKey();
+
+                                break;
+
+                            case ConsoleKey.D2:
+
+
+
+                                break;
+
+                            case ConsoleKey.D3:
+
+
+
+                                break;
+
+                        }
                         // В будующем
 
                         break;
 
+
+
+
+
+
                     case ConsoleKey.D3: // настройки
                         Console.WriteLine("\nВы выбрали настройки\n");
-                        Console.WriteLine("[НАСТРОЙКИ] Что вы хотите поменять? \n\t1. Вид денег\n\n\t0. Назад");
+                        Console.WriteLine("[НАСТРОЙКИ] Что вы хотите поменять? \n\t1. Вид денег\n\t2. SteamID \n\n\t0. Назад");
                         ConsoleKey SettingKey;
-                        switch (SettingKey = Console.ReadKey(true).Key) {
+                        switch (SettingKey = Console.ReadKey(true).Key)
+                        {
                             case ConsoleKey.D1:
                                 string Currency_Type;
                                 ConsoleKey SettingsBool;
                                 Console.WriteLine("\n[ВАЛЮТА] Текщий вид денег: " + Properties.Settings.Default.Currency_Type);
-                                Console.WriteLine("\nВы действительно хотите его поменять? [Y\\N]\n");
+                                Console.WriteLine("\nХотите ли вы его поменять? [Y\\N]\n");
 
-                                switch (SettingsBool = Console.ReadKey(true).Key) {
+                                switch (SettingsBool = Console.ReadKey(true).Key)
+                                {
 
                                     case ConsoleKey.Y:
                                         Console.Write("[ВАЛЮТА] Введите новый вид денег: ");
                                         Properties.Settings.Default.Currency_Type = Currency_Type = Console.ReadLine();
                                         Console.WriteLine("[ВАЛЮТА] Настройки успешно сохранены.");
                                         Properties.Settings.Default.Save();
-                                        break;
-
-                                    case ConsoleKey.N:
-                                        Console.WriteLine("[ВАЛЮТА] Отмена");
                                         break;
 
                                     default:
@@ -296,7 +439,43 @@ namespace Steam_TM_helper
                                 break;
 
                             case ConsoleKey.D2:
-                                // Изменение steamid // 64
+                                // Изменение steamid
+
+                                string SteamID;
+                                ConsoleKey SteamKeyBool;
+
+                                if (String.IsNullOrEmpty(Properties.Settings.Default.SteamID))
+                                { // пуст ли SteamID
+                                    Console.WriteLine("\n[STEAMID] Текущий SteamID не задан." + Properties.Settings.Default.SteamID);
+                                    Console.WriteLine("\nХотите ли вы его задать? [Y\\N]\n");
+
+                                }
+                                else // нет
+                                {
+                                    Console.WriteLine("\n[STEAMID] Текущий SteamID: " + Properties.Settings.Default.SteamID);
+                                    Console.WriteLine("\nХотите ли вы его поменять? [Y\\N]\n");
+                                }
+
+                                switch (SteamKeyBool = Console.ReadKey(true).Key)
+                                {
+                                    case ConsoleKey.Y:
+                                        Console.Write("[STEAMID] Введите новый SteamID: ");
+                                        Properties.Settings.Default.SteamID = SteamID = Console.ReadLine();
+                                        Console.WriteLine("[STEAMID] SteamID успешно сохранены.");
+                                        Properties.Settings.Default.Save();
+                                        break;
+
+                                    default:
+                                        Console.WriteLine("[STEAMID] Отмена");
+
+                                        break;
+
+                                }
+
+                                break;
+
+                            case ConsoleKey.D3:
+                                // 3-я настройка
 
                                 break;
 
@@ -307,7 +486,7 @@ namespace Steam_TM_helper
 
 
                         }
-                        
+
                         break;
 
                     case ConsoleKey.D0:
@@ -320,7 +499,7 @@ namespace Steam_TM_helper
             }
 
 
-            
+
 
 
         }
