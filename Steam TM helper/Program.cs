@@ -59,8 +59,8 @@ namespace Steam_TM_helper
                     Console.WriteLine("[ОШИБКА] " + Text);
                     break;
 
-                case "DarkYellow":
-                    Console.BackgroundColor = ConsoleColor.DarkYellow;
+                case "DarkMagenta":
+                    Console.BackgroundColor = ConsoleColor.DarkMagenta;
                     Console.WriteLine(Text);
 
                     break;
@@ -78,13 +78,20 @@ namespace Steam_TM_helper
         static void Main(string[] args)
         {
             bool Main_Loop = true;
-
+            string Break_Massage = null;
             while (Main_Loop == true)
             {
                 string CurrencyIsNow = Properties.Settings.Default.Currency_Type;
                 Console.Clear();
-                Console.WriteLine("Steam TM helper Update v5\n");
-                Console.WriteLine("Выберите режим:\n \t1. Оффлайн режим \n \t2. Онлайн режим \n \t3. Настройки \n\n \t0. Выход");
+
+                Console.WriteLine("Steam TM helper Update v6");
+                if (!string.IsNullOrEmpty(Break_Massage)) // если что то отменить то можно будет увидить причину
+                {
+                    Text_Color("DarkMagenta", ("Причина выхода: " + Break_Massage));
+
+                    Break_Massage = null;
+                }
+                Console.WriteLine("\nВыберите режим:\n \t1. Оффлайн режим \n \t2. Онлайн режим \n \t3. Настройки \n\n \t0. Выход");
 
                 ConsoleKey KeyChoice = Console.ReadKey(true).Key;
                 switch (KeyChoice)
@@ -97,7 +104,7 @@ namespace Steam_TM_helper
                         { // Выбор Купить, Расчёт стоимости предмета, Продажа
 
                             case ConsoleKey.D1:
-
+                                Console.WriteLine("\n[КУПИТЬ] Купить предметы");
                                 bool buy = true; // цикл для покупки                                
                                 while (buy == true) // цикл покупки
                                 {
@@ -107,18 +114,15 @@ namespace Steam_TM_helper
 
                                     while (IteP == true) // проверка
                                     {
-                                        Console.Write("\n[КУПИТЬ] Введите цену за один предмет: ");
+                                        Console.Write("[КУПИТЬ] Введите цену за один предмет: ");
 
                                         if (!Double.TryParse(Console.ReadLine(), out ItemPrice))
 
                                             Text_Color("DarkRed", "Введите число в формате 1,23");
 
-                                        else if (ItemPrice != 0 & ItemPrice > 0)
-                                        {
-                                            IteP = false;
+                                        else if (ItemPrice != 0 & ItemPrice > 0) IteP = false; // продолжить!
+                                        else buy = IteC = IteP = false; Break_Massage = "[КУПИТЬ] Отмена"; // если 0 или мельше то выход!
 
-                                        }
-                                        else Text_Color("DarkRed", "Введите число > 0");
                                     }
 
                                     while (IteC == true) // проверка
@@ -128,25 +132,29 @@ namespace Steam_TM_helper
                                         if (!Int32.TryParse(Console.ReadLine(), out ItemCount))
                                             Text_Color("Red", "Введите целое число");
 
-                                        else if (ItemCount != 0 & ItemCount > 0) IteC = false;
-                                        else Text_Color("Red", "Введите число > 0");
+                                        else if (ItemCount != 0 & ItemCount > 0) IteC = false; // продолжить!
+                                        else buy = IteC = IteP = false; Break_Massage = "[КУПИТЬ] Отмена"; // если 0 или мельше то выход!
                                     }
 
-                                    Console.WriteLine("\nЦена 1-го предмета: " + ItemPrice + " " + CurrencyIsNow + " Кол-во предметов: " + ItemCount + " Итог: " + ItemPrice * ItemCount + " " + CurrencyIsNow);
-                                    Console.WriteLine("Продать в ноль за: " + Math.Round((ItemPrice * 0.15) + ItemPrice, 2) + " " + CurrencyIsNow);
+                                    if (IteC == false & IteP == false & buy == true) { // 
 
-                                    ConsoleKey ContinueSell;
-                                    Console.WriteLine("Хотите ли вы повторить? [Y\\N]\n");
-                                    switch (ContinueSell = Console.ReadKey(true).Key)
-                                    {
-                                        case ConsoleKey.Y:
-                                            IteP = IteC = true;
-                                            break;
+                                        Console.WriteLine("\nЦена 1-го предмета: " + ItemPrice + " " + CurrencyIsNow + " Кол-во предметов: " + ItemCount + " Итог: " + ItemPrice * ItemCount + " " + CurrencyIsNow);
+                                        Console.WriteLine("Продать в ноль за: " + Math.Round((ItemPrice * 0.15) + ItemPrice, 2) + " " + CurrencyIsNow);
 
-                                        case ConsoleKey.N:
-                                            buy = false;
-                                            break;
+                                        ConsoleKey ContinueSell;
+                                        Console.WriteLine("Хотите ли вы повторить? [Y\\N]\n");
+                                        switch (ContinueSell = Console.ReadKey(true).Key)
+                                        {
+                                            case ConsoleKey.Y:
+                                                IteP = IteC = true;
+                                                break;
+
+                                            case ConsoleKey.N:
+                                                buy = false;
+                                                break;
+                                        }
                                     }
+                                    
 
                                 }
                                 break; // конец цикл покупки
@@ -170,7 +178,7 @@ namespace Steam_TM_helper
                                             Text_Color("DarkRed", "Введите число в формате 1,23");
 
                                         else if (Item_Price != 0 & Item_Price > 0) Sec_Price = false;
-                                        else Text_Color("DarkRed", "Введите число > 0");
+                                        else Count_Buy = Sec_Price = Sec_Balance = false; Break_Massage = "[КУПИТЬ] Отмена"; // если 0 или мельше то выход!
                                     }
 
                                     while (Sec_Balance == true) // проверка баланса
@@ -181,46 +189,52 @@ namespace Steam_TM_helper
                                             Text_Color("DarkRed", "Введите число в формате 1,23");
 
                                         else if (Balance != 0 & Balance > 0) Sec_Balance = false;
-                                        else Text_Color("Red", "Введите число > 0");
+                                        else Count_Buy = Sec_Price = Sec_Balance = false; Break_Massage = "[КУПИТЬ] Отмена"; // если 0 или мельше то выход!
+
                                     }
 
-                                    Console.Write("[РАСЧЕТ] Вы сможите купить себе: ");
-                                    var (x, y) = (Console.CursorLeft, Console.CursorTop);
-                                    while (Sec_Func == true)
-                                    {
-                                        if (Balance >= Item_Price)
+                                    if (Sec_Price == false & Sec_Balance == false & Count_Buy == true){
+
+                                        Console.Write("[РАСЧЕТ] Вы сможите купить себе: ");
+                                        var (x, y) = (Console.CursorLeft, Console.CursorTop);
+                                        while (Sec_Func == true)
                                         {
-                                            Item_Count_All++;
-                                            Balance -= Item_Price;
-                                            Console.SetCursorPosition(x, y);
-                                            Console.Write(Item_Count_All + " предметов");
-                                            if (Math.Round(Balance, 2) < Item_Price)
+                                            if (Balance >= Item_Price)
                                             {
-                                                if (Balance != 0)
-                                                    Console.Write(", Остаток: " + Math.Round(Balance, 2) + " " + CurrencyIsNow);
+                                                Item_Count_All++;
+                                                Balance -= Item_Price;
+                                                Console.SetCursorPosition(x, y);
+                                                Console.Write(Item_Count_All + " предметов");
+                                                if (Math.Round(Balance, 2) < Item_Price)
+                                                {
+                                                    if (Balance != 0)
+                                                        Console.Write(", Остаток: " + Math.Round(Balance, 2) + " " + CurrencyIsNow);
+                                                }
                                             }
+                                            else Sec_Func = false;
+
                                         }
-                                        else Sec_Func = false;
+
+                                        ConsoleKey ContinueBuy;
+                                        Console.WriteLine("\nХотите ли вы повторить? [Y\\N]\n");
+                                        switch (ContinueBuy = Console.ReadKey(true).Key)
+                                        {
+                                            case ConsoleKey.Y:
+                                                Sec_Price = Sec_Balance = true;
+                                                break;
+
+                                            case ConsoleKey.N:
+                                                Count_Buy = false; // выход из цикла
+                                                break;
+
+                                        }
 
                                     }
-
-                                    ConsoleKey ContinueBuy;
-                                    Console.WriteLine("\nХотите ли вы повторить? [Y\\N]\n");
-                                    switch (ContinueBuy = Console.ReadKey(true).Key)
-                                    {
-                                        case ConsoleKey.Y:
-                                            Sec_Price = Sec_Balance = true;
-                                            break;
-
-                                        case ConsoleKey.N:
-                                            Count_Buy = false; // выход из цикла
-                                            break;
-
-                                    }
+                                    
                                 }
                                 break; // конец расчет
 
-                            case ConsoleKey.D3:
+                            case ConsoleKey.D3: // продать
                                 int Sell_Count = 0;
                                 double Sell_Price = 0;
                                 bool Sell_Parce = true, Sell_case = true, Sell_Count_While = true; // циклы
@@ -235,7 +249,7 @@ namespace Steam_TM_helper
                                             Text_Color("Red", "Введите целое число");
 
                                         else if (Sell_Count != 0 & Sell_Count > 0) Sell_Count_While = false;
-                                        else Text_Color("Red", "Введите число > 0");
+                                        else Sell_case = Sell_Count_While = Sell_Parce = false; Break_Massage = "[КУПИТЬ] Отмена"; // если 0 или мельше то выход!
                                     }
 
                                     while (Sell_Parce == true) // проверка
@@ -245,26 +259,29 @@ namespace Steam_TM_helper
                                         if (!Double.TryParse(Console.ReadLine(), out Sell_Price))
                                             Text_Color("DarkRed", "Введите число в формате 1,23");
 
-                                        else if (Sell_Price != 0 & Sell_Price > 0)
-                                        {
-                                            Sell_Parce = false;
-                                        }
-                                        else Text_Color("DarkRed", "Введите число > 0");
+                                        else if (Sell_Price != 0 & Sell_Price > 0) Sell_Parce = false;
+                                        else Sell_case = Sell_Count_While = Sell_Parce = false; Break_Massage = "[КУПИТЬ] Отмена"; // если 0 или мельше то выход!
+
                                     }
-                                    Sell_Price *= Sell_Count;
-                                    Console.WriteLine("\nВы получите: " + Sell_Price + " " + CurrencyIsNow + " Покупатель заплатит: " + Math.Round((Sell_Price * 0.15) + Sell_Price, 2) + " " + CurrencyIsNow);
 
-                                    ConsoleKey ContinueSell;
-                                    Console.WriteLine("\nХотите ли вы повторить? [Y\\N]");
-                                    switch (ContinueSell = Console.ReadKey(true).Key)
-                                    {
-                                        case ConsoleKey.Y:
-                                            Sell_case = Sell_Parce = Sell_Count_While = true;
-                                            break;
+                                    if (Sell_Parce == false & Sell_Count_While == false & Sell_case == true) {
 
-                                        case ConsoleKey.N:
-                                            Sell_case = false; // выход из цикла
-                                            break;
+                                        Sell_Price *= Sell_Count;
+                                        Console.WriteLine("\nВы получите: " + Sell_Price + " " + CurrencyIsNow + " Покупатель заплатит: " + Math.Round((Sell_Price * 0.15) + Sell_Price, 2) + " " + CurrencyIsNow);
+
+                                        ConsoleKey ContinueSell;
+                                        Console.WriteLine("\nХотите ли вы повторить? [Y\\N]");
+                                        switch (ContinueSell = Console.ReadKey(true).Key)
+                                        {
+                                            case ConsoleKey.Y:
+                                                Sell_case = Sell_Parce = Sell_Count_While = true;
+                                                break;
+
+                                            case ConsoleKey.N:
+                                                Sell_case = false; // выход из цикла
+                                                break;
+
+                                        }
 
                                     }
 
@@ -285,10 +302,8 @@ namespace Steam_TM_helper
                         Console.WriteLine("\nВы выбрали offline режим\n");
                         Console.WriteLine("[ONLINE] Выбирите что вы хотите сделать:\n \t1. Получить данные \n \t2. -\n \t3. -\n\n\t0. Назад");
 
-
                         switch (oReadKey = Console.ReadKey(true).Key)
                         {
-
                             case ConsoleKey.D1:
 
                                 bool sCustomID = false, sSteam64ID = false, sError = false;
@@ -364,7 +379,91 @@ namespace Steam_TM_helper
                                     if (sCustomID == true | sSteam64ID == true & sError == false) // Если хоть одна ссылка заработала то норм
                                     {
                                         // дальше идут действия связанные с данными.
-                                        // 
+                                        string[] data = new string[16]; // создание массива на 15 элементов
+
+                                        foreach (XmlNode xnode in xRoot) {
+
+                                            switch (xnode.Name){
+
+                                                case "steamID64":
+                                                    data[0] = xnode.InnerText;
+                                                    break;                                        
+
+                                                case "steamID":
+                                                    data[1] = xnode.InnerText;
+                                                    break;
+
+                                                case "onlineState":
+                                                    data[2] = xnode.InnerText;
+                                                    break;
+
+                                                case "stateMessage":
+                                                    data[3] = xnode.InnerText;
+                                                    break;
+
+                                                case "privacyState":
+                                                    data[4] = xnode.InnerText;
+                                                    break;
+
+                                                case "visibilityState":
+                                                    data[5] = xnode.InnerText;
+                                                    break;
+
+                                                case "vacBanned":
+                                                    data[6] = xnode.InnerText;
+                                                    break;
+
+                                                case "tradeBanState":
+                                                    data[7] = xnode.InnerText;
+                                                    break;
+
+                                                case "isLimitedAccount":
+                                                    data[8] = xnode.InnerText;
+                                                    break;
+
+                                                case "customURL":
+                                                    data[9] = xnode.InnerText;
+                                                    break;
+
+                                                case "memberSince":
+                                                    data[10] = xnode.InnerText;
+                                                    break;
+
+                                                case "hoursPlayed2WK":
+                                                    data[11] = xnode.InnerText;
+                                                    break;
+
+                                                case "headline":
+                                                    data[12] = xnode.InnerText;
+                                                    break;
+
+                                                case "location":
+                                                    data[13] = xnode.InnerText;
+                                                    break;
+
+                                                case "realname":
+                                                    data[14] = xnode.InnerText;
+                                                    break;
+
+                                                case "summary":
+                                                    data[15] = xnode.InnerText;
+                                                    break;
+
+                                            }
+
+
+
+
+                                        // Console.WriteLine(xnode.Name+" "+ xnode.InnerText);
+
+                                        }
+                                        int arrcount = 0;
+                                        while (data.Length > arrcount) {
+                                            Console.WriteLine(data[arrcount]);
+                                            arrcount++;
+
+                                        }
+
                                         sCustomID = sSteam64ID = sError = false;
                                     }
                                     else if (sCustomID == false & sSteam64ID == false & sError == true)
@@ -407,7 +506,7 @@ namespace Steam_TM_helper
 
                     case ConsoleKey.D3: // настройки
                         Console.WriteLine("\nВы выбрали настройки\n");
-                        Console.WriteLine("[НАСТРОЙКИ] Что вы хотите поменять? \n\t1. Вид денег\n\t2. SteamID \n\n\t0. Назад");
+                        Console.WriteLine("[НАСТРОЙКИ] Что вы хотите поменять? \n\t1. Вид денег\n\t2. SteamID\n\t3. Steam Api Key \n\n\t0. Назад");
                         ConsoleKey SettingKey;
                         switch (SettingKey = Console.ReadKey(true).Key)
                         {
@@ -447,7 +546,7 @@ namespace Steam_TM_helper
                                 if (String.IsNullOrEmpty(Properties.Settings.Default.SteamID))
                                 { // пуст ли SteamID
                                     Console.WriteLine("\n[STEAMID] Текущий SteamID не задан." + Properties.Settings.Default.SteamID);
-                                    Console.WriteLine("\nХотите ли вы его задать? [Y\\N]\n");
+                                    Console.WriteLine("Хотите ли вы его задать? [Y\\N]\n");
 
                                 }
                                 else // нет
@@ -475,7 +574,41 @@ namespace Steam_TM_helper
                                 break;
 
                             case ConsoleKey.D3:
-                                // 3-я настройка
+                                // 3-я настройка - SteamApiKey
+                                string SteamApiKey;
+                                ConsoleKey SteamApiKeyBool;
+
+                                if (String.IsNullOrEmpty(Properties.Settings.Default.SteamApiKey))
+                                { // пуст ли STEAMAPIKEY
+                                    Console.WriteLine("\n[APIKEY] Текущий Api Key не задан." + Properties.Settings.Default.SteamApiKey);
+                                    Console.WriteLine("Хотите ли вы его задать? [Y\\N]\n");
+
+                                }
+                                else // нет
+                                {
+                                    Console.WriteLine("\n[APIKEY] Текущий Api Key: " + Properties.Settings.Default.SteamApiKey);
+                                    Console.WriteLine("\nХотите ли вы его поменять? [Y\\N]\n");
+                                }
+
+                                switch (SteamApiKeyBool = Console.ReadKey(true).Key)
+                                {
+                                    case ConsoleKey.Y:
+                                        Console.Write("[APIKEY] Введите новый Api Key: ");
+                                        Properties.Settings.Default.SteamApiKey = SteamApiKey = Console.ReadLine();
+                                        Console.WriteLine("[APIKEY] Api Key успешно сохранены.");
+                                        Properties.Settings.Default.Save();
+                                        break;
+
+                                    default:
+                                        Console.WriteLine("[STEAMID] Отмена");
+
+                                        break;
+
+                                }
+                                break;
+
+                            case ConsoleKey.D4:
+                                // 4-я настройка
 
                                 break;
 
