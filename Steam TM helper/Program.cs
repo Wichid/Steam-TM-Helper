@@ -84,15 +84,19 @@ namespace Steam_TM_helper
                 string CurrencyIsNow = Properties.Settings.Default.Currency_Type;
                 Console.Clear();
 
-                Console.WriteLine("Steam TM helper Update v6");
+                Console.WriteLine("Steam TM Helper | Update v7");
+                
+
                 if (!string.IsNullOrEmpty(Break_Massage)) // если что то отменить то можно будет увидить причину
                 {
                     Text_Color("DarkMagenta", ("Причина выхода: " + Break_Massage));
 
                     Break_Massage = null;
                 }
-                Console.WriteLine("\nВыберите режим:\n \t1. Оффлайн режим \n \t2. Онлайн режим \n \t3. Настройки \n\n \t0. Выход");
 
+                Console.WriteLine("\nВыберите режим:\n \t1. Оффлайн режим \n \t2. Онлайн режим \n \t3. Настройки \n\n \t0. Выход");
+                Console.WriteLine("\nРелизы: https://Git.Io/fjxVq" +
+                    "\nАвтор: Wichid");
                 ConsoleKey KeyChoice = Console.ReadKey(true).Key;
                 switch (KeyChoice)
                 { // Выбор режима Онлайн или Офлайн
@@ -325,29 +329,13 @@ namespace Steam_TM_helper
                                     { // если xml файл содержит тэг error знатит профиль не найден
 
                                         Text_Color("DarkRed", tSpaceRemover(XmlTreeDoc.InnerText)); // вывод  сообщения xml файла
+                                        Console.Beep();
                                         sError = true;
                                     }
+                                     // рефактоинг двух if
+                                    if (XmlTreeDoc.Name == "customURL" & ( Properties.Settings.Default.SteamID == tSpaceRemover(XmlTreeDoc.InnerText) ) ) sCustomID = true;// проверка на совпадение введённого steam id с тем который в xml файле
 
-                                    if (XmlTreeDoc.Name == "customURL")
-                                    {
-                                        if (Properties.Settings.Default.SteamID == tSpaceRemover(XmlTreeDoc.InnerText))// проверка на совпадение введённого steam id с тем который в xml файле
-                                        {
-                                            Console.WriteLine("CustomURL == SteamID");
-                                            sCustomID = true;
-                                        }
-
-                                    }
-
-                                    if (XmlTreeDoc.Name == "steamID64")
-                                    {
-
-                                        if (Properties.Settings.Default.SteamID == XmlTreeDoc.InnerText)
-                                        {
-                                            Console.WriteLine("Steam64ID == SteamID");
-                                            sSteam64ID = true;
-                                        }
-
-                                    }
+                                    if (XmlTreeDoc.Name == "steamID64" & (Properties.Settings.Default.SteamID == XmlTreeDoc.InnerText) ) sSteam64ID = true; // если steamid == тому котрый в xml документе то ок!
                                     else if (sError == true)
                                     { // загрузка второго документа
                                         Console.WriteLine("\n[ДАННЫЕ] Загрузка xml документа[2].");
@@ -360,16 +348,12 @@ namespace Steam_TM_helper
                                             if (XmlTreeDoc64.Name == "error")
                                             {
                                                 Text_Color("DarkRed", tSpaceRemover(XmlTreeDoc.InnerText));
+                                                Console.Beep();
                                                 sError = true;
                                                 break;
                                             }
 
-                                            if (Properties.Settings.Default.SteamID == XmlTreeDoc64.InnerText)
-                                            {
-                                                Console.WriteLine("Steam64ID == SteamID");
-                                                sSteam64ID = true;
-                                            }
-
+                                            if (Properties.Settings.Default.SteamID == XmlTreeDoc64.InnerText) sSteam64ID = true; // если steamid == тому котрый в xml документе то ок!
 
                                         }
 
@@ -451,24 +435,245 @@ namespace Steam_TM_helper
 
                                             }
 
-
-
-
                                         // Console.WriteLine(xnode.Name+" "+ xnode.InnerText);
 
                                         }
-                                        int arrcount = 0;
-                                        while (data.Length > arrcount) {
-                                            Console.WriteLine(data[arrcount]);
-                                            arrcount++;
+                                        Console.WriteLine("\n[ДАННЫЕ] Полученные данные из Community Data xml");
+                                        Console.WriteLine("Ник: "               + data[1] + "\t| STEAM64ID:" + data[0]);
+                                        Console.WriteLine("Имя: "               + data[14] + "\t\t| Локация: " + data[13]);
+                                        Console.WriteLine("Онлайн статус: "     + data[2] + "\t| Статус: " + data[3]);
+                                        Console.WriteLine("В стим с: " + data[10] );
 
+                                        Console.WriteLine("\nПриватность:\t"+ data[4]);
+                                        Console.WriteLine("Видимость:\t"    + data[5]);
+                                        Console.WriteLine("VAC:\t\t"        + data[6]);
+                                        Console.WriteLine("Бан трейда:\t"   + data[7]);
+                                        Console.WriteLine("Лимит на аккаунте: " + data[8]);
+                                        Console.WriteLine("\nURL:https://steamcommunity.com/profiles/" + data[0] + "/" + " | URL:https://steamcommunity.com/id/" + data[9]+"/");
+
+                                        // Отправка запроса серверу и получение ответа
+                                        // вдруг сервер ответит что ключ не валид
+                                        // Отправка запроса
+                                        WebRequest sApiRequest = WebRequest.Create(@"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" +Properties.Settings.Default.SteamApiKey + "&steamids=" + data[0] + "&format=xml");
+                                        HttpWebResponse sApiResponse = null;
+
+                                        try
+                                        {
+                                            sApiResponse = (HttpWebResponse)sApiRequest.GetResponse();
                                         }
+                                        catch (WebException sAns) {
+                                            sApiResponse = (HttpWebResponse)sAns.Response;
+                                        }
+
+                                        if (sApiResponse.StatusCode == HttpStatusCode.OK) // если сервер вернул код 200 (ОК) то значит ключ подошёл
+                                        {
+
+                                            XmlDocument sApiInfo = new XmlDocument();
+                                            Console.WriteLine("\n[SteamApiKey] Загрузка дополнительных данных.");
+                                            Text_Color("Blue", "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=*скрыто*&steamids=" + data[0] + "&format=xml");
+                                            sApiInfo.Load(@"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" + Properties.Settings.Default.SteamApiKey + "&steamids=" + data[0] + "&format=xml");
+                                            XmlElement sApiSummaries = sApiInfo.DocumentElement;
+
+                                            string[] sSummaries = new string[17]; 
+
+                                            foreach (XmlNode sApiRoot in sApiSummaries)
+                                            {
+                                                if (sApiRoot.Name == "players")
+                                                {
+                                                    foreach (XmlNode sApiDataTree in sApiRoot) {
+                                                        if (sApiDataTree.Name == "player") {
+                                                            foreach (XmlNode sApiData in sApiDataTree) {
+                                                                switch (sApiData.Name)
+                                                                {
+                                                                    // public data
+                                                                    case "steamid": // 64id
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[0] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "personaname": // personaname - Username
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[1] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "profileurl": // community url
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[2] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "personastate": // 0 - Offline, 1 - Online, 2 - Busy, 3 - Away, 4 - Snooze, 5 - looking to trade, 6 - looking to play.
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[3] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "communityvisibilitystate": // приватность 3 == public?
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[4] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "profilestate": // Был ли настроин профиль
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[5] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "lastlogoff": // был в сети в UNIX time
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[6] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "commentpermission": // Открыты ли коментарии
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[7] = sApiData.InnerText;
+                                                                        break;
+
+                                                                        // private
+                                                                        
+                                                                    case "realname": // типо Максим
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[8] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "primaryclanid": // "Главная" группа
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[9] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "timecreated": // Unix Дата создания
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[10] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "gameid": // если in-game то id игры
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[11] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "gameserverip": //
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[12] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "gameextrainfo": // название игры, если нон-стим то имя приложения
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[13] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "loccountrycode": //
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[14] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "locstatecode": //
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[15] = sApiData.InnerText;
+                                                                        break;
+
+                                                                    case "loccityid": //
+                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                        sSummaries[16] = sApiData.InnerText;
+                                                                        break;
+
+
+                                                                }
+
+
+                                                            }
+
+
+                                                        }
+
+
+                                                    }
+                                                }
+
+                                            }
+                                            // загрузка списка банов
+                                            string[] sDataBans = new string[6];
+
+                                            XmlDocument DataBans = new XmlDocument();
+                                            Console.WriteLine("\n[SteamApiKey] Загрузка банов аккаунта.");
+                                            Text_Color("Blue", "http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=" + Properties.Settings.Default.SteamApiKey + "&steamids=" + data[0] + "&format=xml");
+                                            DataBans.Load   ( @"http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=" + Properties.Settings.Default.SteamApiKey + "&steamids=" + data[0] + "&format=xml");
+                                            XmlElement DataBansEl = DataBans.DocumentElement;
+
+                                            foreach (XmlNode BanTree in DataBansEl) {
+                                                if (BanTree.Name == "players") {
+                                                    foreach (XmlNode sBansPlayer in BanTree) {
+                                                        if (sBansPlayer.Name == "player") {
+                                                            foreach (XmlNode sBans in sBansPlayer) {
+                                                                switch (sBans.Name)
+                                                                {
+                                                                    case "CommunityBanned": // Ну тут всё ясно XD
+                                                                        Console.WriteLine(sBans.InnerText);
+                                                                        sDataBans[0] = sBans.InnerText;
+                                                                        break;
+
+                                                                    case "VACBanned": // и тут
+                                                                        Console.WriteLine(sBans.InnerText);
+                                                                        sDataBans[1] = sBans.InnerText;
+                                                                        break;
+
+                                                                    case "NumberOfVACBans": //и тут
+                                                                        Console.WriteLine(sBans.InnerText);
+                                                                        sDataBans[2] = sBans.InnerText;
+                                                                        break;
+
+                                                                    case "DaysSinceLastBan": //и тут
+                                                                        Console.WriteLine(sBans.InnerText);
+                                                                        sDataBans[3] = sBans.InnerText;
+                                                                        break;
+
+                                                                    case "NumberOfGameBans": //и тут
+                                                                        Console.WriteLine(sBans.InnerText);
+                                                                        sDataBans[4] = sBans.InnerText;
+                                                                        break;
+
+                                                                    case "EconomyBan": //и тут
+                                                                        Console.WriteLine(sBans.InnerText);
+                                                                        sDataBans[5] = sBans.InnerText;
+                                                                        break;
+
+                                                                }
+
+                                                            }
+                                                            
+
+                                                        }
+                                                        
+
+                                                    }
+                                                }
+
+                                            }
+
+
+
+                                            //
+
+
+                                        } else if ( string.IsNullOrEmpty(Properties.Settings.Default.SteamApiKey) ) Text_Color("DarkRed", "[APIKEY] Что бы получить доп. данные введите SteamApiKey в настройках");
+
+                                        else if (sApiResponse.StatusCode == HttpStatusCode.Forbidden) // если сервер запрещяет доступ то
+                                        {
+                                            if (string.IsNullOrEmpty(Properties.Settings.Default.SteamApiKey))// проверка на ноль или пустоту
+                                            {
+                                                Text_Color("DarkMagenta", "Для получения доп. данных введите SteamApiKey");// Если ApiKey не задан то написать
+                                            }
+                                            else {
+                                                Text_Color("DarkRed", "[APIKEY] Ошибка 403, Вы ввели неправельный SteamApikey");// если доступ запрещён то значит что неправельный ключ
+                                            }
+                                        }
+                                        else {
+                                            Text_Color("DarkRed", "[APIKEY] Неизвестная ошибка!"); // другая любая ошибка типо 404 и т. д.
+                                        }
+
+                                        sApiResponse.Close();// закрытие 
 
                                         sCustomID = sSteam64ID = sError = false;
                                     }
                                     else if (sCustomID == false & sSteam64ID == false & sError == true)
                                     { // если ошибка то вывод текста
-
+                                        Break_Massage = "Похоже что вы ввели не правельный SteamID[64/Custom], измените его в настройках!";
                                         Text_Color("DarkRed", "Похоже что вы ввели не правельный SteamID[64/Custom], измените его в настройках!");
                                         Console.WriteLine("sCustomID: {0}, sSteamID64: {1}, sError: {2}", sCustomID, sSteam64ID, sError);
                                         sCustomID = sSteam64ID = sError = false;
@@ -477,7 +682,7 @@ namespace Steam_TM_helper
 
                                 }
                                 ////
-
+                                Console.WriteLine("\nНажмите любую клавищу для продолжения...");
                                 Console.ReadKey();
 
                                 break;
@@ -498,9 +703,6 @@ namespace Steam_TM_helper
                         // В будующем
 
                         break;
-
-
-
 
 
 
@@ -580,8 +782,9 @@ namespace Steam_TM_helper
 
                                 if (String.IsNullOrEmpty(Properties.Settings.Default.SteamApiKey))
                                 { // пуст ли STEAMAPIKEY
-                                    Console.WriteLine("\n[APIKEY] Текущий Api Key не задан." + Properties.Settings.Default.SteamApiKey);
-                                    Console.WriteLine("Хотите ли вы его задать? [Y\\N]\n");
+                                    Console.WriteLine("\n[APIKEY] Текущий Api Key не задан.");
+                                    Text_Color("Blue","Вы можете получить его тут: https://steamcommunity.com/dev/apikey");
+                                    Console.WriteLine("\nХотите ли вы его задать? [Y\\N]\n");
 
                                 }
                                 else // нет
