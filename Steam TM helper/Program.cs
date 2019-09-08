@@ -15,7 +15,6 @@ namespace Steam_TM_helper
 
         static string tSpaceRemover(string Text)
         {
-
             if (Text.IndexOf(' ') >= 0)
             {
                 Text = Text.Remove(Text.IndexOf(' '), 1);
@@ -37,7 +36,7 @@ namespace Steam_TM_helper
 
             switch (Color)
             {
-
+                // Writeline
                 case "Red":
                     Console.BackgroundColor = ConsoleColor.Red;
                     Console.WriteLine("[ОШИБКА] " + Text);
@@ -62,8 +61,36 @@ namespace Steam_TM_helper
                 case "DarkMagenta":
                     Console.BackgroundColor = ConsoleColor.DarkMagenta;
                     Console.WriteLine(Text);
+                    break;
+
+
+                // write
+                case "RedN":
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.Write("[ОШИБКА] " + Text);
+                    break;
+
+                case "GreenN":
+                    Console.BackgroundColor = ConsoleColor.Green;
+                    Console.Write(Text);
 
                     break;
+
+                case "BlueN":
+                    Console.BackgroundColor = ConsoleColor.Blue;
+                    Console.Write(Text);
+                    break;
+
+                case "DarkRedN":
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.Write("[ОШИБКА] " + Text);
+                    break;
+
+                case "DarkMagentaN":
+                    Console.BackgroundColor = ConsoleColor.DarkMagenta;
+                    Console.Write(Text);
+                    break;
+
 
                 default:
                     Console.BackgroundColor = ConsoleColor.Red;
@@ -83,8 +110,7 @@ namespace Steam_TM_helper
             {
                 string CurrencyIsNow = Properties.Settings.Default.Currency_Type;
                 Console.Clear();
-
-                Console.WriteLine("Steam TM Helper | Update v7");
+                Console.WriteLine("Steam TM Helper | Update v7.1 | by Wichid\nhttps://git.io/fjxVq");
                 
 
                 if (!string.IsNullOrEmpty(Break_Massage)) // если что то отменить то можно будет увидить причину
@@ -93,10 +119,8 @@ namespace Steam_TM_helper
 
                     Break_Massage = null;
                 }
-
+                
                 Console.WriteLine("\nВыберите режим:\n \t1. Оффлайн режим \n \t2. Онлайн режим \n \t3. Настройки \n\n \t0. Выход");
-                Console.WriteLine("\nРелизы: https://Git.Io/fjxVq" +
-                    "\nАвтор: Wichid");
                 ConsoleKey KeyChoice = Console.ReadKey(true).Key;
                 switch (KeyChoice)
                 { // Выбор режима Онлайн или Офлайн
@@ -439,7 +463,7 @@ namespace Steam_TM_helper
 
                                         }
                                         Console.WriteLine("\n[ДАННЫЕ] Полученные данные из Community Data xml");
-                                        Console.WriteLine("Ник: "               + data[1] + "\t| STEAM64ID:" + data[0]);
+                                        Console.WriteLine("STEAM64ID: " + data[0] + " | Ник:" + data[1]);
                                         Console.WriteLine("Имя: "               + data[14] + "\t\t| Локация: " + data[13]);
                                         Console.WriteLine("Онлайн статус: "     + data[2] + "\t| Статус: " + data[3]);
                                         Console.WriteLine("В стим с: " + data[10] );
@@ -487,89 +511,72 @@ namespace Steam_TM_helper
                                                                 {
                                                                     // public data
                                                                     case "steamid": // 64id
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[0] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "personaname": // personaname - Username
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[1] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "profileurl": // community url
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[2] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "personastate": // 0 - Offline, 1 - Online, 2 - Busy, 3 - Away, 4 - Snooze, 5 - looking to trade, 6 - looking to play.
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[3] = sApiData.InnerText;
                                                                         break;
 
-                                                                    case "communityvisibilitystate": // приватность 3 == public?
-                                                                        Console.WriteLine(sApiData.InnerText);
+                                                                    case "communityvisibilitystate": // приватность 1 == ЗКАРЫТО
                                                                         sSummaries[4] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "profilestate": // Был ли настроин профиль
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[5] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "lastlogoff": // был в сети в UNIX time
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[6] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "commentpermission": // Открыты ли коментарии
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[7] = sApiData.InnerText;
                                                                         break;
 
                                                                         // private
                                                                         
                                                                     case "realname": // типо Максим
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[8] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "primaryclanid": // "Главная" группа
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[9] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "timecreated": // Unix Дата создания
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[10] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "gameid": // если in-game то id игры
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[11] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "gameserverip": //
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[12] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "gameextrainfo": // название игры, если нон-стим то имя приложения
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[13] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "loccountrycode": //
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[14] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "locstatecode": //
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[15] = sApiData.InnerText;
                                                                         break;
 
                                                                     case "loccityid": //
-                                                                        Console.WriteLine(sApiData.InnerText);
                                                                         sSummaries[16] = sApiData.InnerText;
                                                                         break;
 
@@ -592,7 +599,8 @@ namespace Steam_TM_helper
 
                                             XmlDocument DataBans = new XmlDocument();
                                             Console.WriteLine("\n[SteamApiKey] Загрузка банов аккаунта.");
-                                            Text_Color("Blue", "http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=" + Properties.Settings.Default.SteamApiKey + "&steamids=" + data[0] + "&format=xml");
+                                            Text_Color("Blue", "http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=*Скрыто*&steamids=" + data[0] + "&format=xml");
+                                            
                                             DataBans.Load   ( @"http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=" + Properties.Settings.Default.SteamApiKey + "&steamids=" + data[0] + "&format=xml");
                                             XmlElement DataBansEl = DataBans.DocumentElement;
 
@@ -604,32 +612,26 @@ namespace Steam_TM_helper
                                                                 switch (sBans.Name)
                                                                 {
                                                                     case "CommunityBanned": // Ну тут всё ясно XD
-                                                                        Console.WriteLine(sBans.InnerText);
                                                                         sDataBans[0] = sBans.InnerText;
                                                                         break;
 
                                                                     case "VACBanned": // и тут
-                                                                        Console.WriteLine(sBans.InnerText);
                                                                         sDataBans[1] = sBans.InnerText;
                                                                         break;
 
                                                                     case "NumberOfVACBans": //и тут
-                                                                        Console.WriteLine(sBans.InnerText);
                                                                         sDataBans[2] = sBans.InnerText;
                                                                         break;
 
                                                                     case "DaysSinceLastBan": //и тут
-                                                                        Console.WriteLine(sBans.InnerText);
                                                                         sDataBans[3] = sBans.InnerText;
                                                                         break;
 
                                                                     case "NumberOfGameBans": //и тут
-                                                                        Console.WriteLine(sBans.InnerText);
                                                                         sDataBans[4] = sBans.InnerText;
                                                                         break;
 
                                                                     case "EconomyBan": //и тут
-                                                                        Console.WriteLine(sBans.InnerText);
                                                                         sDataBans[5] = sBans.InnerText;
                                                                         break;
 
@@ -647,11 +649,42 @@ namespace Steam_TM_helper
                                             }
 
 
+                                            /*
+                                             ВЫВОД ВСЕХ ДАННЫХ ИЗ 2-х МАССИВОВ
+                                            sSummaries  - ОБЫЧНЫЕ ДАННЫЕ
+                                            sDataBans   - БАНЫ
+                                            */
+                                            Text_Color("DarkMagenta", "\n[!] В целях экономии места буду писать коротко, иногда на eng.");
+                                            Console.WriteLine("[ДАННЫЕ] Публичные данные.");
+                                            Console.WriteLine("Steam64ID: "+sSummaries[0]+ " | Nick: " + sSummaries[1]);
+                                            Console.WriteLine("Настройка профиля: " + sSummaries[5] + " | Статус профиля: " +sSummaries[3] );
+                                            Console.WriteLine("Видимость профиля: " + sSummaries[4] + " | Доступ к комментариям: " + sSummaries[7]);
+                                            Console.WriteLine("Last off: " + sSummaries[6]+" | URL: " + sSummaries[2]);
+                                            // private
+                                            if      (sSummaries[4] == "1")  Console.WriteLine("Профиль закрыт!");
+                                            else if (sSummaries[4] == "2")  Console.WriteLine("Профиль закрыт! Но открыт для друзей.");
+                                            else {
+                                                Console.WriteLine("\n[ДАННЫЕ] Приватные данные");
+                                                if (!String.IsNullOrEmpty(sSummaries[8])) Console.Write("Имя: " + sSummaries[8]); if (!String.IsNullOrEmpty(sSummaries[14])) Console.Write(" | Страна: " + sSummaries[14] + "\n");
+                                                if (!String.IsNullOrEmpty(sSummaries[9])) Console.WriteLine("ClanId: " + sSummaries[9]);
+                                                Console.WriteLine("Acc created UNIX: " + sSummaries[10]);
+                                                if (!String.IsNullOrEmpty(sSummaries[11])) Console.WriteLine("ID игры: " + sSummaries[11] + " | ip сервера: " + sSummaries[12]);
+                                                if (!String.IsNullOrEmpty(sSummaries[13])) Console.WriteLine("non-steam игры: " + sSummaries[13]);
+                                                if (!String.IsNullOrEmpty(sSummaries[15])) Console.WriteLine("Штат/город: " + sSummaries[15]);
+                                                if (!String.IsNullOrEmpty(sSummaries[16])) Console.WriteLine("Область: " + sSummaries[16]);
+
+                                            }
+                                            Console.WriteLine("\n[ДАННЫЕ] Баны");
+
+                                            Console.WriteLine("Кол-во VAC баннов: " + sDataBans[2]+" | VAC Бан: " + sDataBans[1]);
+                                            Console.WriteLine("Дней с VAC бана: " + sDataBans[3] + " | Бан сообщества: " + sDataBans[0]);
+                                            Console.WriteLine("Кол-во игровых банов: " + sDataBans[4] + " | 5$ лимит: " + sDataBans[5]);
 
                                             //
 
 
-                                        } else if ( string.IsNullOrEmpty(Properties.Settings.Default.SteamApiKey) ) Text_Color("DarkRed", "[APIKEY] Что бы получить доп. данные введите SteamApiKey в настройках");
+                                        }
+                                        else if ( string.IsNullOrEmpty(Properties.Settings.Default.SteamApiKey) ) Text_Color("DarkRed", "[APIKEY] Что бы получить доп. данные введите SteamApiKey в настройках");
 
                                         else if (sApiResponse.StatusCode == HttpStatusCode.Forbidden) // если сервер запрещяет доступ то
                                         {
@@ -708,7 +741,11 @@ namespace Steam_TM_helper
 
                     case ConsoleKey.D3: // настройки
                         Console.WriteLine("\nВы выбрали настройки\n");
-                        Console.WriteLine("[НАСТРОЙКИ] Что вы хотите поменять? \n\t1. Вид денег\n\t2. SteamID\n\t3. Steam Api Key \n\n\t0. Назад");
+                        Console.WriteLine("[НАСТРОЙКИ] Что вы хотите поменять?");
+                        Console.Write("\n\t1. Вид денег \t"); Text_Color("BlueN", Properties.Settings.Default.Currency_Type);
+                        Console.Write("\n\t2. SteamID \t"); Text_Color("BlueN", Properties.Settings.Default.SteamID);
+                        Console.Write("\n\t3. Steam Api Key");if (!String.IsNullOrEmpty(Properties.Settings.Default.SteamApiKey)) Console.Write(": *Скрыт*");
+                        Console.WriteLine("\n\n\t0. Назад");
                         ConsoleKey SettingKey;
                         switch (SettingKey = Console.ReadKey(true).Key)
                         {
