@@ -58,5 +58,17 @@ namespace Steam_TM_helper.Properties {
                 this["SteamApiKey"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string sRealSteam64ID {
+            get {
+                return ((string)(this["sRealSteam64ID"]));
+            }
+            set {
+                this["sRealSteam64ID"] = value;
+            }
+        }
     }
 }

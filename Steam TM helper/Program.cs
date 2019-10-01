@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Xml;
 using System.Net;
+using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -102,17 +103,18 @@ namespace Steam_TM_helper
             Console.ResetColor();
         }
 
+
         static void Main(string[] args)
         {
+            
             bool Main_Loop = true;
             string Break_Massage = null;
             while (Main_Loop == true)
             {
                 string CurrencyIsNow = Properties.Settings.Default.Currency_Type;
                 Console.Clear();
-                Console.WriteLine("Steam TM Helper | Update v7.1 | by Wichid\nhttps://git.io/fjxVq");
+                Console.WriteLine("Steam TM Helper | Update v7.1.1 | by Wichid\nhttps://git.io/fjxVq");
                 
-
                 if (!string.IsNullOrEmpty(Break_Massage)) // если что то отменить то можно будет увидить причину
                 {
                     Text_Color("DarkMagenta", ("Причина выхода: " + Break_Massage));
@@ -233,11 +235,7 @@ namespace Steam_TM_helper
                                                 Balance -= Item_Price;
                                                 Console.SetCursorPosition(x, y);
                                                 Console.Write(Item_Count_All + " предметов");
-                                                if (Math.Round(Balance, 2) < Item_Price)
-                                                {
-                                                    if (Balance != 0)
-                                                        Console.Write(", Остаток: " + Math.Round(Balance, 2) + " " + CurrencyIsNow);
-                                                }
+                                                if (Math.Round(Balance, 2) < Item_Price & Balance != 0) Console.Write(", Остаток: " + Math.Round(Balance, 2) + " " + CurrencyIsNow);
                                             }
                                             else Sec_Func = false;
 
@@ -287,14 +285,17 @@ namespace Steam_TM_helper
                                         if (!Double.TryParse(Console.ReadLine(), out Sell_Price))
                                             Text_Color("DarkRed", "Введите число в формате 1,23");
 
-                                        else if (Sell_Price != 0 & Sell_Price > 0) Sell_Parce = false;
+                                        else if (Sell_Price != 0 & Sell_Price > 0) {
+                                            Sell_Parce = false;
+                                            Sell_Price *= Sell_Count;
+                                        }
                                         else Sell_case = Sell_Count_While = Sell_Parce = false; Break_Massage = "[КУПИТЬ] Отмена"; // если 0 или мельше то выход!
 
                                     }
+                                    
 
                                     if (Sell_Parce == false & Sell_Count_While == false & Sell_case == true) {
 
-                                        Sell_Price *= Sell_Count;
                                         Console.WriteLine("\nВы получите: " + Sell_Price + " " + CurrencyIsNow + " Покупатель заплатит: " + Math.Round((Sell_Price * 0.15) + Sell_Price, 2) + " " + CurrencyIsNow);
 
                                         ConsoleKey ContinueSell;
@@ -328,7 +329,7 @@ namespace Steam_TM_helper
                     case ConsoleKey.D2: // ОНЛАЙН ЧАСТЬ!
                         ConsoleKey oReadKey;
                         Console.WriteLine("\nВы выбрали offline режим\n");
-                        Console.WriteLine("[ONLINE] Выбирите что вы хотите сделать:\n \t1. Получить данные \n \t2. -\n \t3. -\n\n\t0. Назад");
+                        Console.WriteLine("[ONLINE] Выбирите что вы хотите сделать:\n \t1. Получить данные \n \t2. Дерево друзей\n \t3. -\n\n\t0. Назад");
 
                         switch (oReadKey = Console.ReadKey(true).Key)
                         {
@@ -371,20 +372,24 @@ namespace Steam_TM_helper
                                         {
                                             if (XmlTreeDoc64.Name == "error")
                                             {
-                                                Text_Color("DarkRed", tSpaceRemover(XmlTreeDoc.InnerText));
+                                                Text_Color("DarkRed", tSpaceRemover(XmlTreeDoc64.InnerText));
                                                 Console.Beep();
                                                 sError = true;
                                                 break;
                                             }
 
-                                            if (Properties.Settings.Default.SteamID == XmlTreeDoc64.InnerText) sSteam64ID = true; // если steamid == тому котрый в xml документе то ок!
+                                            if (Properties.Settings.Default.SteamID == XmlTreeDoc64.InnerText) {
+                                                sSteam64ID = true;
+                                                sError = false;
+
+                                            }  // если steamid == тому котрый в xml документе то ок!
 
                                         }
 
                                     }
 
 
-                                    if (sCustomID == true | sSteam64ID == true & sError == false) // Если хоть одна ссылка заработала то норм
+                                    if ((sCustomID == true | sSteam64ID == true) & sError == false) // Если хоть одна ссылка заработала то норм
                                     {
                                         // дальше идут действия связанные с данными.
                                         string[] data = new string[16]; // создание массива на 15 элементов
@@ -627,10 +632,6 @@ namespace Steam_TM_helper
                                                                         sDataBans[3] = sBans.InnerText;
                                                                         break;
 
-                                                                    case "NumberOfGameBans": //и тут
-                                                                        sDataBans[4] = sBans.InnerText;
-                                                                        break;
-
                                                                     case "EconomyBan": //и тут
                                                                         sDataBans[5] = sBans.InnerText;
                                                                         break;
@@ -720,7 +721,60 @@ namespace Steam_TM_helper
 
                                 break;
 
+
                             case ConsoleKey.D2:
+                                // friend tree
+                                Console.WriteLine("Вы выбрали дерево друзей.\n");
+                                Console.WriteLine("[FriendTree] Выбирите способ. \n\t1. Используя ваш SteamID \n\t2. Используя SteamID друга \n\n\t0. Назад");
+
+                                ConsoleKey fTreeKey;
+                                fTreeKey = Console.ReadKey(true).Key;
+
+                                switch (fTreeKey) {
+                                    case ConsoleKey.D1:
+                                        // Добавить ввод и проверку steamId 
+                                        Console.WriteLine("");
+
+
+                                        XmlDocument fTreeFriendSelf = new XmlDocument();
+                                        // try catch NET !!!!!!!
+
+                                        
+                                        fTreeFriendSelf.Load(@"http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=" + Properties.Settings.Default.SteamApiKey + "&steamid=76561198135861777&format=xml&relationship=friend");
+                                        XmlElement fTreefriendSelfElement = fTreeFriendSelf.DocumentElement;
+                                        int i = 0;
+                                        int d = 0;
+                                        int c = 0;
+                                        foreach (XmlNode FriendsTree in fTreefriendSelfElement) {
+                                            Console.WriteLine(c + fTreefriendSelfElement.Name);
+                                            c++;
+                                            foreach (XmlNode FriendTree in FriendsTree) {// friend
+                                                Console.WriteLine(i + FriendTree.Name);
+                                                i++;
+                                                foreach (XmlNode FriendTreeDetails in FriendTree) {// iside friend XD
+                                                    if (FriendTreeDetails.Name == "steamid") {
+                                                        Console.WriteLine(d + " " + FriendTreeDetails.InnerText);
+                                                        d++;
+                                                    } 
+                                                    
+                                                }
+                                                
+                                            }
+
+                                        }
+
+
+                                        Console.ReadKey();
+
+                                        break;
+
+                                    case ConsoleKey.D2:
+                                        Console.WriteLine("2");
+                                        Console.ReadKey();
+
+                                        break;
+                                }
+
 
 
 
